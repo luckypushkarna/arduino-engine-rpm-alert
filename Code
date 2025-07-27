@@ -1,0 +1,64 @@
+const int potPin = A0;
+
+const int ledPins[] = {2, 3, 4, 6 , 7, 8, 9, 10, 11, 12}; 
+
+
+const int warningLed1 = 11; 
+const int warningLed2 = 12; 
+const int buzzerPin = 5;  
+
+void setup() {
+  Serial.begin(9600);
+
+  for (int i = 0; i < 9; i++) {
+    pinMode(ledPins[i], OUTPUT);
+  }
+
+  pinMode(warningLed1, OUTPUT);
+  pinMode(warningLed2, OUTPUT);
+  pinMode(buzzerPin, OUTPUT);
+}
+
+void loop() {
+  int potValue = analogRead(potPin);
+  int rpm = map(potValue, 0, 1023, 1000, 9000);
+
+  Serial.print("RPM: ");
+  Serial.println(rpm);
+
+  
+  for (int i = 0; i < 9; i++) {
+    digitalWrite(ledPins[i], LOW);
+  }
+
+
+  if (rpm >= 1000) digitalWrite(ledPins[0], HIGH);
+  if (rpm >= 2000) digitalWrite(ledPins[1], HIGH);
+  if (rpm >= 3000) digitalWrite(ledPins[2], HIGH);
+  if (rpm >= 4000) digitalWrite(ledPins[3], HIGH);
+  if (rpm >= 5000) digitalWrite(ledPins[4], HIGH);
+  if (rpm >= 6000) digitalWrite(ledPins[5], HIGH);
+  if (rpm >= 7000) digitalWrite(ledPins[6], HIGH);
+  if (rpm >= 7500) digitalWrite(ledPins[7], HIGH);
+  if (rpm >= 7900) digitalWrite(ledPins[8], HIGH);
+
+  
+  if (rpm >= 8000) {
+    for (int brightness = 0; brightness <= 255; brightness += 5) {
+      analogWrite(warningLed1, brightness);
+      analogWrite(warningLed2, 255 - brightness); // cross-fade
+      digitalWrite(buzzerPin, brightness > 200 ? HIGH : LOW);
+      delay(10);
+    }
+    for (int brightness = 255; brightness >= 0; brightness -= 5) {
+      analogWrite(warningLed1, brightness);
+      analogWrite(warningLed2, 255 - brightness); // cross-fade
+      digitalWrite(buzzerPin, brightness > 200 ? HIGH : LOW);
+      delay(10);
+    }
+  } else {
+    analogWrite(warningLed1, 0);
+    analogWrite(warningLed2, 0);
+    digitalWrite(buzzerPin, LOW);
+  }
+}
